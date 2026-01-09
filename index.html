@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Kalender</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="hover-zone"></div>
+
+<aside class="sidebar">
+  <h1 class="logo">Smart Kalender</h1>
+
+  <nav class="menu">
+    <a href="#" class="active" data-view="calendar">Kalender</a>
+    <a href="#" data-view="notes">Anteckningar</a>
+  </nav>
+
+  <button class="upcoming-btn">Kommande aktivitet</button>
+
+  <div class="weather">
+    <div class="temp" id="temp">--°</div>
+    <div class="status" id="weather-status">Laddar väder…</div>
+  </div>
+</aside>
+
+<main class="content">
+
+  <header class="topbar">
+    <div class="left">
+      <span class="pill" id="today-date"></span>
+      <span class="pill red" id="current-time"></span>
+    </div>
+
+    <div class="right">
+      <button class="icon">‹</button>
+      <button class="icon">›</button>
+      <span class="pill" id="week-number"></span>
+    </div>
+  </header>
+
+  <section class="calendar view active-view" id="calendar-view">
+    <div class="calendar-grid" id="calendarGrid">
+
+      <div class="cell header"></div>
+      <div class="cell header">Dag 1</div>
+      <div class="cell header">Dag 2</div>
+      <div class="cell header">Dag 3</div>
+      <div class="cell header">Dag 4</div>
+      <div class="cell header">Dag 5</div>
+      <div class="cell header">Dag 6+</div>
+
+    </div>
+  </section>
+
+  <section class="notes view" id="notes-view">
+    <textarea id="notesArea" placeholder="Skriv dina anteckningar här..."></textarea>
+    <div class="notes-actions">
+      <button class="save secondary">Spara som</button>
+      <button class="save primary" id="saveNotes">Spara</button>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>
