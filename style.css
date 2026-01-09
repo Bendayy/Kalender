@@ -38,6 +38,16 @@ body {
   left: 0;
 }
 
+.content {
+  margin-left: 0;
+  transition: margin-left 0.35s ease;
+}
+
+.hover-zone:hover ~ .content,
+.sidebar:hover ~ .content {
+  margin-left: 260px;
+}
+
 .logo {
   font-size: 22px;
   color: #4a4aff;

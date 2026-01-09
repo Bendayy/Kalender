@@ -95,7 +95,7 @@ document.querySelectorAll('.menu a').forEach(link => {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
     document.getElementById(link.dataset.view + '-view').classList.add('active-view');
   };
-});
+}); 
 
 const grid = document.getElementById('calendarGrid');
 const events = JSON.parse(localStorage.getItem('events') || '{}');
