@@ -100,7 +100,6 @@ document.getElementById('nextWeek').onclick = () => {
 };
 
 const grid = document.getElementById('calendarGrid');
-const notesArea = document.getElementById('notesArea');
 
 function buildCalendar() {
   grid.innerHTML = `
@@ -115,10 +114,10 @@ function buildCalendar() {
 
   const events = JSON.parse(localStorage.getItem('events') || '{}');
 
-  for (let h = 9; h <= 15; h++) {
+  for (let h = 0; h <= 23; h++) {
     const time = document.createElement('div');
     time.className = 'time';
-    time.textContent = `${h}:00`;
+    time.textContent = `${String(h).padStart(2,'0')}:00`;
     grid.appendChild(time);
 
     for (let d = 0; d < 6; d++) {
@@ -150,7 +149,9 @@ function buildCalendar() {
 
 buildCalendar();
 
+const notesArea = document.getElementById('notesArea');
 notesArea.value = localStorage.getItem('notes') || '';
+
 document.getElementById('saveNotes').onclick = () => {
   localStorage.setItem('notes', notesArea.value);
   alert('Anteckningar sparade!');
