@@ -28,133 +28,56 @@
 
 <main class="content">
 
-<header class="topbar">
-  <div class="left">
-    <span class="pill" id="today-date"></span>
-    <span class="pill red" id="current-time"></span>
-  </div>
+  <header class="topbar">
+    <div class="left">
+      <span class="pill" id="today-date"></span>
+      <span class="pill red" id="current-time"></span>
+    </div>
 
-  <div class="right">
-    <button class="icon" id="prevWeek">‹</button>
-    <button class="icon" id="nextWeek">›</button>
-    <span class="pill" id="week-number"></span>
-  </div>
-</header>
+    <div class="right">
+      <button class="icon">‹</button>
+      <button class="icon">›</button>
+      <span class="pill" id="week-number"></span>
+    </div>
+  </header>
 
-<section class="calendar view active-view">
-  <div class="calendar-grid" id="calendarGrid">
-    <div class="cell header"></div>
-    <div class="cell header">Dag 1</div>
-    <div class="cell header">Dag 2</div>
-    <div class="cell header">Dag 3</div>
-    <div class="cell header">Dag 4</div>
-    <div class="cell header">Dag 5</div>
-    <div class="cell header">Dag 6+</div>
-  </div>
-</section>
+  <section class="calendar view active-view" id="calendar-view">
+    <div class="calendar-grid" id="calendarGrid">
+      <div class="cell header"></div>
+      <div class="cell header">Dag 1</div>
+      <div class="cell header">Dag 2</div>
+      <div class="cell header">Dag 3</div>
+      <div class="cell header">Dag 4</div>
+      <div class="cell header">Dag 5</div>
+      <div class="cell header">Dag 6+</div>
+    </div>
+  </section>
 
-<section class="notes view" id="notes-view">
-  <textarea id="notesArea" placeholder="Skriv dina anteckningar här..."></textarea>
-  <div class="notes-actions">
-    <button class="save secondary">Spara som</button>
-    <button class="save primary" id="saveNotes">Spara</button>
-  </div>
-</section>
+  <section class="notes view" id="notes-view">
+    <textarea id="notesArea" placeholder="Skriv dina anteckningar här..."></textarea>
+    <div class="notes-actions">
+      <button class="save secondary">Spara som</button>
+      <button class="save primary" id="saveNotes">Spara</button>
+    </div>
+  </section>
 
 <script>
-let weekOffset = 0;
-
-function getWeekNumber(date) {
-  const d = new Date(date);
-  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
-  const week1 = new Date(d.getFullYear(), 0, 4);
-  return 1 + Math.round(((d - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
-}
-
-function updateDateTime() {
+    function updateDateTime() {
   const now = new Date();
-  const shown = new Date(now);
-  shown.setDate(shown.getDate() + weekOffset * 7);
-
   document.getElementById('today-date').textContent =
-    shown.toLocaleDateString('sv-SE', { weekday:'long', day:'numeric', month:'long' });
-
+    now.toLocaleDateString('sv-SE', { weekday:'long', day:'numeric', month:'long' });
   document.getElementById('current-time').textContent =
     now.toLocaleTimeString('sv-SE', { hour:'2-digit', minute:'2-digit' });
 
-  document.getElementById('week-number').textContent =
-    `Vecka ${getWeekNumber(shown)}`;
+  const d = new Date(now);
+  d.setHours(0,0,0,0);
+  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+  const week1 = new Date(d.getFullYear(),0,4);
+  const week = 1 + Math.round(((d - week1)/86400000 - 3 + (week1.getDay()+6)%7)/7);
+  document.getElementById('week-number').textContent = `Vecka ${week}`;
 }
-
-updateDateTime();
 setInterval(updateDateTime, 1000);
-
-document.getElementById('prevWeek').onclick = () => {
-  weekOffset--;
-  buildCalendar();
-};
-
-document.getElementById('nextWeek').onclick = () => {
-  weekOffset++;
-  buildCalendar();
-};
-
-const grid = document.getElementById('calendarGrid');
-const notesArea = document.getElementById('notesArea');
-
-function buildCalendar() {
-  grid.innerHTML = `
-    <div class="cell header"></div>
-    <div class="cell header">Dag 1</div>
-    <div class="cell header">Dag 2</div>
-    <div class="cell header">Dag 3</div>
-    <div class="cell header">Dag 4</div>
-    <div class="cell header">Dag 5</div>
-    <div class="cell header">Dag 6+</div>
-  `;
-
-  const events = JSON.parse(localStorage.getItem('events') || '{}');
-
-  for (let h = 9; h <= 15; h++) {
-    const time = document.createElement('div');
-    time.className = 'time';
-    time.textContent = `${h}:00`;
-    grid.appendChild(time);
-
-    for (let d = 0; d < 6; d++) {
-      const cell = document.createElement('div');
-      cell.className = 'cell event-cell';
-      const id = `${weekOffset}-${h}-${d}`;
-
-      if (events[id]) {
-        const ev = document.createElement('div');
-        ev.className = 'event';
-        ev.textContent = events[id];
-        cell.appendChild(ev);
-      }
-
-      cell.onclick = () => {
-        const title = prompt('Eventtitel:');
-        if (!title) return;
-        events[id] = title;
-        localStorage.setItem('events', JSON.stringify(events));
-        buildCalendar();
-      };
-
-      grid.appendChild(cell);
-    }
-  }
-
-  updateDateTime();
-}
-
-buildCalendar();
-
-notesArea.value = localStorage.getItem('notes') || '';
-document.getElementById('saveNotes').onclick = () => {
-  localStorage.setItem('notes', notesArea.value);
-  alert('Anteckningar sparade!');
-};
+updateDateTime();
 
 fetch('https://api.open-meteo.com/v1/forecast?latitude=59.33&longitude=18.07&current_weather=true')
   .then(r => r.json())
@@ -172,9 +95,53 @@ document.querySelectorAll('.menu a').forEach(link => {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
     document.getElementById(link.dataset.view + '-view').classList.add('active-view');
   };
-});
+}); 
+
+const grid = document.getElementById('calendarGrid');
+const events = JSON.parse(localStorage.getItem('events') || '{}');
+
+for (let h = 9; h <= 15; h++) {
+  const time = document.createElement('div');
+  time.className = 'time';
+  time.textContent = `${h}:00`;
+  grid.appendChild(time);
+
+  for (let d = 0; d < 6; d++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell event-cell';
+    const id = `${h}-${d}`;
+    cell.dataset.id = id;
+
+    if (events[id]) {
+      const ev = document.createElement('div');
+      ev.className = 'event';
+      ev.textContent = events[id];
+      cell.appendChild(ev);
+    }
+
+    cell.onclick = () => {
+      const title = prompt('Eventtitel:');
+      if (!title) return;
+
+      events[id] = title;
+      localStorage.setItem('events', JSON.stringify(events));
+      location.reload();
+    };
+
+    grid.appendChild(cell);
+  }
+}
+
+const notesArea = document.getElementById('notesArea');
+notesArea.value = localStorage.getItem('notes') || '';
+
+document.getElementById('saveNotes').onclick = () => {
+  localStorage.setItem('notes', notesArea.value);
+  alert('Anteckningar sparade!');
+};
 </script>
 
 </main>
+
 </body>
 </html>
