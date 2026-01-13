@@ -29,27 +29,24 @@
 <main class="content">
 
 <header class="topbar">
-  <div class="left">
-    <span class="pill" id="today-date"></span>
-    <span class="pill red" id="current-time"></span>
-  </div>
+  <div class="left" style="display: flex; align-items: center; gap: 10px;">
+    <!-- Dagens datum -->
+    <span id="today-date"></span>
 
-  <div class="right">
-    <button class="icon" id="prevWeek">‹</button>
-    <button class="icon" id="nextWeek">›</button>
-    <span class="pill" id="week-number"></span>
+    <!-- Veckodropdown direkt bredvid datumet -->
+    <div class="week-menu-wrapper" style="position: relative; display: inline-block;">
+        <span id="week-number" style="cursor: pointer;">Vecka 1</span>
+        <ul id="week-menu" class="week-menu"></ul>
+    </div>
+
+    <!-- Klocka -->
+    <span id="current-time"></span>
   </div>
 </header>
 
-<section class="calendar view active-view">
-  <div class="calendar-grid" id="calendarGrid">
-    <div class="cell header"></div>
-    <div class="cell header">Dag 1</div>
-    <div class="cell header">Dag 2</div>
-    <div class="cell header">Dag 3</div>
-    <div class="cell header">Dag 4</div>
-    <div class="cell header">Dag 5</div>
-    <div class="cell header">Dag 6+</div>
+<section id="calendar-view" class="view active-view">
+  <div class="calendar">
+    <div id="calendarGrid" class="calendar-grid">
   </div>
 </section>
 
@@ -89,27 +86,45 @@ function updateDateTime() {
 updateDateTime();
 setInterval(updateDateTime, 1000);
 
-document.getElementById('prevWeek').onclick = () => {
-  weekOffset--;
-  buildCalendar();
+const weekNumber = document.getElementById('week-number');
+const weekMenu = document.getElementById('week-menu');
+
+// Fyll veckor 1–52
+for (let i = 1; i <= 52; i++) {
+  const li = document.createElement('li');
+  li.textContent = `Vecka ${i}`;
+  li.onclick = (e) => {
+    weekOffset = i - getWeekNumber(new Date()); // justera kalendern
+    buildCalendar();
+    weekMenu.style.display = 'none';
+  };
+  weekMenu.appendChild(li);
+}
+
+// Visa/dölj menyn
+weekNumber.onclick = (e) => {
+  e.stopPropagation();
+  weekMenu.style.display = weekMenu.style.display === 'block' ? 'none' : 'block';
 };
 
-document.getElementById('nextWeek').onclick = () => {
-  weekOffset++;
-  buildCalendar();
-};
+// Klick utanför stänger menyn
+document.addEventListener('click', () => {
+  weekMenu.style.display = 'none';
+});
+
 
 const grid = document.getElementById('calendarGrid');
 
 function buildCalendar() {
   grid.innerHTML = `
     <div class="cell header"></div>
-    <div class="cell header">Dag 1</div>
-    <div class="cell header">Dag 2</div>
-    <div class="cell header">Dag 3</div>
-    <div class="cell header">Dag 4</div>
-    <div class="cell header">Dag 5</div>
-    <div class="cell header">Dag 6+</div>
+    <div class="cell header">Måndag</div>
+    <div class="cell header">Tisdag</div>
+    <div class="cell header">Onsdag</div>
+    <div class="cell header">Torsdag</div>
+    <div class="cell header">Fredag</div>
+    <div class="cell header">Lördag</div>
+    <div class="cell header">Söndag</div>
   `;
 
   const events = JSON.parse(localStorage.getItem('events') || '{}');
@@ -120,7 +135,7 @@ function buildCalendar() {
     time.textContent = `${String(h).padStart(2,'0')}:00`;
     grid.appendChild(time);
 
-    for (let d = 0; d < 6; d++) {
+    for (let d = 0; d < 7; d++) {
       const cell = document.createElement('div');
       cell.className = 'cell event-cell';
       const id = `${weekOffset}-${h}-${d}`;
@@ -132,7 +147,20 @@ function buildCalendar() {
         cell.appendChild(ev);
       }
 
+      // Klick på cellen
       cell.onclick = () => {
+        if (events[id]) {
+          // Om det redan finns ett event, fråga om man vill ta bort det
+          const remove = confirm("Vill du ta bort detta event?");
+          if (remove) {
+            delete events[id];
+            localStorage.setItem('events', JSON.stringify(events));
+            buildCalendar();
+          }
+          return; // stoppar här
+        }
+
+        // Om ingen titel finns, fråga efter ny titel
         const title = prompt('Eventtitel:');
         if (!title) return;
         events[id] = title;
@@ -146,6 +174,7 @@ function buildCalendar() {
 
   updateDateTime();
 }
+
 
 buildCalendar();
 

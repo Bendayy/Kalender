@@ -102,20 +102,46 @@ body {
   align-items: center;
 }
 
-.pill {
-  padding: 6px 12px;
-  border-radius: 8px;
-  background: #fff;
-  border: 1px solid #ccc;
-  margin-right: 6px;
-}
-
 .icon {
   padding: 8px 12px;
   border-radius: 8px;
   background: #fff;
   border: 1px solid #ccc;
   cursor: pointer;
+}
+
+
+/* ===================== WEEK DROPDOWN ===================== */
+
+.week-menu {
+  display: none;
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 4px 0;
+  min-width: 120px;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+  /* Scrollbar */
+  max-height: calc(10 * 32px); /* 10 veckor synliga */
+  overflow-y: auto;
+
+  list-style: none;
+}
+
+.week-menu li {
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.week-menu li:hover {
+  background: #ddd;
 }
 
 /* ===================== VIEWS ===================== */
@@ -133,7 +159,7 @@ body {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: 80px repeat(6, 1fr);
+  grid-template-columns: 80px repeat(7, 1fr);
 }
 
 .header {
@@ -149,6 +175,8 @@ body {
   border: 1px solid #e6e6e6;
   height: 60px;
   position: relative;
+  min-width: 80px; /* hindrar att kolumner krymper för mycket */
+  height: 60px;
 }
 
 .cell.event-cell:hover {
@@ -209,15 +237,32 @@ body {
 }
 
 
-@media (max-width: 768px) {
-
-  body {
-    overflow: auto;
+@media (max-width: 1024px) {
+  /* Topbar: mindre padding och staplad layout */
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 
-  /* Hover är avstängt på mobil */
-  .hover-zone {
-    display: none;
+  /* Veckomeny nära datumet */
+  .week-menu-wrapper {
+    margin-top: 4px;
+  }
+
+  /* Kalender scrollar horisontellt om skärmen är smal */
+  .calendar {
+    overflow-x: auto;
+  }
+
+  .calendar-grid {
+    min-width: 700px; /* säkerställer att alla 7 dagar syns */
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    overflow: auto;
   }
 
   /* Sidebar blir slide-in */
@@ -235,6 +280,7 @@ body {
   .content {
     margin-left: 0 !important;
     padding: 16px;
+    overflow-x: auto; /* tillåter scroll på hela innehållet */
   }
 
   /* Topbar staplas */
@@ -251,10 +297,19 @@ body {
 
   .calendar-grid {
     min-width: 720px;
+    display: grid;
+    grid-template-columns: 80px repeat(7, 1fr); /* 1 kolumn för tider, 7 för dagar */
+    gap: 0;
+
   }
 
   .cell {
     height: 70px;
+  }
+
+  /* Veckomeny bredare på mobil */
+  .week-menu {
+    min-width: 160px;
   }
 
   /* Notes */
@@ -273,5 +328,27 @@ body {
   .notes-actions {
     flex-direction: column;
     gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-grid {
+    min-width: 600px; /* Smalare skärmar */
+  }
+
+  .cell {
+    height: 60px;
+  }
+
+  .topbar .left,
+  .topbar .right {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .week-menu {
+    right: 0; /* så den hamnar på rätt ställe på små skärmar */
+    left: auto;
   }
 }
