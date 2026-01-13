@@ -39,13 +39,13 @@ body {
 }
 
 .content {
-  margin-left: 0;
+  margin-left: 0; /* innehållet i .content margin-left gjorde så att menyn inte överskrider självaste kalendern  */
   transition: margin-left 0.35s ease;
 }
 
 .hover-zone:hover ~ .content,
 .sidebar:hover ~ .content {
-  margin-left: 260px;
+  margin-left: 260px;  
 }
 
 .logo {
