@@ -86,6 +86,7 @@ body {
   padding: 30px;
   background: #f7f7f7;
   height: 100%;
+  overflow-y: auto;
 }
 
 .topbar {
@@ -109,6 +110,7 @@ body {
   border-radius: 6px;
   background: #fff;
   border: 1px solid #ccc;
+  cursor: pointer;
 }
 
 .view { display: none; }
