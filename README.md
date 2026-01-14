@@ -1,20 +1,19 @@
 PROJEKT: Kalender |||
-Namn på alla deltagare: Saed - Efehan - Benhur - Tomiwa - Leon
+Namn på alla deltagare: Saed - Efehan - Benhur - Tomiwa - Vilja
 
 ### Tävlar i kategori: 
 
 ## Projekt & Teknisk- beskrivning
 
-Här skriver ni vad ni har gjort, försök att formulera det så att det blir relevant för kategorin ni tänker att ni tävlar i.
-T.ex. om ni har fokuserat på just UI/UX så är det mer relevant än om ni 
+Vi har gjort en kalender med syfte att motivera en att komma igång med planering i ens liv. I index filen 
 
 Det ska även ingå en tekniskt beskrivning, där ni beskriver en eller flera tekniska lösningar i projektet. Ni skall beskriva funktionen av den tekniska lösningen och hur den används i projektet. Ju tydligare beskrivning desto enklare att bedöma den tekniska lösningen. Beskrivningen skall vara förståelig även för personer som inte kan programmera.
 
 ### Externt producerade komponenter
 
-Här presenterar ni saker som ni har laddat ner och använt för att bygga ert arbete. Beskriv också i vilken utsträckning de behövs för projektet.
+I denna projekt så användes det externa material som bilder, mp3 fil och api för att för att få åtkomst till vädret.
 
 ### Install
 
-Här skriver ni vad vi i juryn behöver göra för att kunna köra ert program / app / webbsida
+Öppna länken: https://bendayy.github.io/Kalender/
 

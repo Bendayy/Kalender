@@ -280,6 +280,27 @@ body {
   transform: scale(1.1);
 }
 
+
+.mute-btn {
+  position: relative; /* behövs för linjen */
+}
+
+/* Diagonal mute-line */
+.mute-btn.muted::after {
+  content: "";
+  position: absolute;
+  width: 28px;          /* lite större än ikonen */
+  height: 3px;          /* linjens tjocklek */
+  background: black;  /* röd mute-linje */
+  transform: rotate(-45deg);
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+
+
 .sound-icon {
   width: 20px;
   height: 20px;
@@ -303,6 +324,7 @@ body {
   transform: scale(1.08);
   box-shadow: 0 6px 18px rgba(0, 12, 64, 0.25);
 }
+
 
 
 /* ===================== WEEK DROPDOWN FIX ===================== */
