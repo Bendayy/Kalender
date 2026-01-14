@@ -46,7 +46,7 @@ body {
   position: fixed;
   left: 0;
   top: 0;
-  width: 12px;
+  width: 30px;
   height: 100%;
   z-index: 99;
   display: none;
@@ -59,7 +59,7 @@ body {
   transform: translateY(-50%);
   width: 4px;
   height: 120px;
-  background: linear-gradient(180deg, rgba(240, 242, 240, 0.5) 0%, rgba(0, 12, 64, 0.5) 100%);
+  background: linear-gradient(180deg, rgba(0, 12, 64, 0.5) 100%, rgba(0, 12, 64, 0.5) 100%);
   border-radius: 2px;
   z-index: 98;
   transition: opacity 0.3s ease, background 0.3s ease;
@@ -319,8 +319,7 @@ body {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.date-pill:hover,
-.week-badge:hover {
+.date-pill:hover{
   transform: scale(1.08);
   box-shadow: 0 6px 18px rgba(0, 12, 64, 0.25);
 }
@@ -371,12 +370,7 @@ body {
   background: rgba(255,255,255,0.2);
 }
 
-/* Pilen roterar när dropdownen är öppen */
-.week-badge.open .dropdown-arrow {
-  transform: rotate(180deg);
-  opacity: 1;
-  transition: transform 0.25s ease;
-}
+
 
 /* ===================== VIEWS ===================== */
 
