@@ -8,17 +8,45 @@
 </head>
 
 <body>
+<!-- Splash Screen -->
+<div id="splash-screen" class="splash-screen">
+  <p id="enter-text" class="enter-text">click to enter</p>
+</div>
+
+<!-- Bakgrundsmusik -->
+<audio id="bg-music" loop preload="auto">
+  <source src="./Musik/moti.mp3" type="audio/mpeg">
+</audio>
+
 <div class="hover-zone"></div>
+<div class="sidebar-indicator"></div>
 
 <aside class="sidebar">
-  <h1 class="logo">Smart Kalender</h1>
+  <h1 class="logo">
+    <div class="logo-icon">G15</div>
+    <span class="logo-text">Smart Kalender</span>
+  </h1>
 
   <nav class="menu">
     <a href="#" class="active" data-view="calendar">Kalender</a>
-    <a href="#" data-view="notes">Anteckningar</a>
+    <a href="#" data-view="todos">Uppgifter</a>
   </nav>
 
-  <button class="upcoming-btn">Kommande aktivitet</button>
+  <div class="stats-widget">
+    <div class="stat-item">
+      <span class="stat-label">Events</span>
+      <span class="stat-value" id="event-count">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Uppgifter</span>
+      <span class="stat-value" id="todo-count">0</span>
+    </div>
+  </div>
+
+  <div class="focus-widget">
+    <div class="focus-label">Dagens fokus</div>
+    <div class="focus-text" id="focus-text">Var produktiv idag</div>
+  </div>
 
   <div class="weather">
     <div class="temp" id="temp">--°</div>
@@ -30,17 +58,26 @@
 
 <header class="topbar">
   <div class="left" style="display: flex; align-items: center; gap: 10px;">
-    <!-- Dagens datum -->
-    <span id="today-date"></span>
+    <!-- Dagens  och tid -->
+   <span id="today-date" class="date-pill"></span>
+   <span id="current-time" class="date-pill"></span>
 
     <!-- Veckodropdown direkt bredvid datumet -->
-    <div class="week-menu-wrapper" style="position: relative; display: inline-block;">
-        <span id="week-number" style="cursor: pointer;">Vecka 1</span>
-        <ul id="week-menu" class="week-menu"></ul>
+   <div class="week-menu-wrapper week-badge">
+      <span id="week-number"></span>
+      <span class="dropdown-arrow">▾</span>
+      <ul id="week-menu" class="week-menu"></ul>
     </div>
+  </div>
 
-    <!-- Klocka -->
-    <span id="current-time"></span>
+
+  </div>
+  <div class="right">
+    <button id="muteBtn" class="mute-btn" title="Muta/Unmuta musik">
+      <svg class="sound-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="currentColor"/>
+      </svg>
+    </button>
   </div>
 </header>
 
@@ -50,11 +87,13 @@
   </div>
 </section>
 
-<section class="notes view" id="notes-view">
-  <textarea id="notesArea" placeholder="Skriv dina anteckningar här..."></textarea>
-  <div class="notes-actions">
-    <button class="save secondary">Spara som</button>
-    <button class="save primary" id="saveNotes">Spara</button>
+<section class="todos view" id="todos-view">
+  <div class="todos-container">
+    <div class="todos-header">
+      <h2>Uppgifter</h2>
+      <button class="add-todo-btn" id="addTodoBtn">+</button>
+    </div>
+    <div class="todos-list" id="todosList"></div>
   </div>
 </section>
 
@@ -68,23 +107,127 @@ function getWeekNumber(date) {
   return 1 + Math.round(((d - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
 }
 
+// Positiva quotes
+const positiveQuotes = [
+  'Var produktiv idag',
+  'Fokusera på det viktiga',
+  'Små steg leder till stora resultat',
+  'Var närvarande i nuet',
+  'Du kan mer än du tror',
+  'Varje dag är en ny möjlighet',
+  'Framsteg, inte perfektion',
+  'Tro på dig själv'
+];
+
+let currentQuoteIndex = 0;
+let isTyping = false;
+let isDeleting = false;
+let quoteTimeout;
+
+function typeText(element, text, callback) {
+  if (isTyping || isDeleting) return;
+  
+  isTyping = true;
+  let index = 0;
+  
+  const typeInterval = setInterval(() => {
+    if (index < text.length) {
+      element.textContent = text.substring(0, index + 1);
+      index++;
+    } else {
+      clearInterval(typeInterval);
+      isTyping = false;
+      if (callback) callback();
+    }
+  }, 100);
+}
+
+function deleteText(element, callback) {
+  if (isTyping || isDeleting) return;
+  
+  isDeleting = true;
+  let text = element.textContent;
+  let index = text.length;
+  
+  const deleteInterval = setInterval(() => {
+    if (index > 0) {
+      element.textContent = text.substring(0, index - 1);
+      index--;
+    } else {
+      clearInterval(deleteInterval);
+      isDeleting = false;
+      if (callback) callback();
+    }
+  }, 50);
+}
+
+function animateWeekNumber() {
+  const weekNumberEl = document.getElementById('week-number');
+  if (!weekNumberEl) return;
+  
+  const now = new Date();
+  const shown = new Date(now);
+  shown.setDate(shown.getDate() + weekOffset * 7);
+  const weekText = `Vecka ${getWeekNumber(shown)}`;
+  
+  // Typa veckonumret
+  typeText(weekNumberEl, weekText, () => {
+    // Vänta lite, sedan ta bort
+    setTimeout(() => {
+      deleteText(weekNumberEl, () => {
+        // Typa quote
+        const quote = positiveQuotes[currentQuoteIndex];
+        typeText(weekNumberEl, quote, () => {
+          // Vänta lite, sedan ta bort quote
+          setTimeout(() => {
+            deleteText(weekNumberEl, () => {
+              // Byt till nästa quote och börja om
+              currentQuoteIndex = (currentQuoteIndex + 1) % positiveQuotes.length;
+              quoteTimeout = setTimeout(animateWeekNumber, 500);
+            });
+          }, 3000);
+        });
+      });
+    }, 2000);
+  });
+}
+
 function updateDateTime() {
   const now = new Date();
   const shown = new Date(now);
   shown.setDate(shown.getDate() + weekOffset * 7);
 
-  document.getElementById('today-date').textContent =
-    shown.toLocaleDateString('sv-SE', { weekday:'long', day:'numeric', month:'long' });
+  const dateString = shown.toLocaleDateString('sv-SE', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long'
+});
+
+document.getElementById('today-date').textContent =
+  dateString.charAt(0).toUpperCase() + dateString.slice(1);
+
 
   document.getElementById('current-time').textContent =
     now.toLocaleTimeString('sv-SE', { hour:'2-digit', minute:'2-digit' });
 
-  document.getElementById('week-number').textContent =
-    `Vecka ${getWeekNumber(shown)}`;
+  // Uppdatera veckonumret endast om animationen inte pågår
+  if (!isTyping && !isDeleting) {
+    clearTimeout(quoteTimeout);
+    const weekNumberEl = document.getElementById('week-number');
+    const weekText = `Vecka ${getWeekNumber(shown)}`;
+    if (weekNumberEl && !weekNumberEl.textContent.includes('Vecka')) {
+      weekNumberEl.textContent = weekText;
+    }
+  }
 }
 
 updateDateTime();
 setInterval(updateDateTime, 1000);
+
+// Starta animationen för veckonumret
+setTimeout(() => {
+  animateWeekNumber();
+}, 1000);
 
 const weekNumber = document.getElementById('week-number');
 const weekMenu = document.getElementById('week-menu');
@@ -94,9 +237,14 @@ for (let i = 1; i <= 52; i++) {
   const li = document.createElement('li');
   li.textContent = `Vecka ${i}`;
   li.onclick = (e) => {
+    e.stopPropagation();
     weekOffset = i - getWeekNumber(new Date()); // justera kalendern
     buildCalendar();
     weekMenu.style.display = 'none';
+    // Starta om animationen efter att ha valt vecka
+    setTimeout(() => {
+      animateWeekNumber();
+    }, 500);
   };
   weekMenu.appendChild(li);
 }
@@ -104,12 +252,37 @@ for (let i = 1; i <= 52; i++) {
 // Visa/dölj menyn
 weekNumber.onclick = (e) => {
   e.stopPropagation();
-  weekMenu.style.display = weekMenu.style.display === 'block' ? 'none' : 'block';
+  clearTimeout(quoteTimeout);
+  isTyping = false;
+  isDeleting = false;
+  const now = new Date();
+  const shown = new Date(now);
+  shown.setDate(shown.getDate() + weekOffset * 7);
+  weekNumber.textContent = `Vecka ${getWeekNumber(shown)}`;
+
+  const wrapper = weekNumber.parentElement;
+  const isOpen = weekMenu.style.display === 'block';
+  weekMenu.style.display = isOpen ? 'none' : 'block';
+  wrapper.classList.toggle('open', !isOpen);
 };
 
-// Klick utanför stänger menyn
-document.addEventListener('click', () => {
-  weekMenu.style.display = 'none';
+
+// Klick utanför stänger menyn (men inte på menyn själv)
+document.addEventListener('click', (e) => {
+  if (!weekMenu.contains(e.target) && e.target !== weekNumber) {
+    if (weekMenu.style.display === 'block') {
+      weekMenu.style.display = 'none';
+      // Starta om animationen när menyn stängs
+      setTimeout(() => {
+        animateWeekNumber();
+      }, 500);
+    }
+  }
+});
+
+// Förhindra att klick på menyn stänger den
+weekMenu.addEventListener('click', (e) => {
+  e.stopPropagation();
 });
 
 
@@ -117,14 +290,16 @@ const grid = document.getElementById('calendarGrid');
 
 function buildCalendar() {
   grid.innerHTML = `
-    <div class="cell header"></div>
-    <div class="cell header">Måndag</div>
-    <div class="cell header">Tisdag</div>
-    <div class="cell header">Onsdag</div>
-    <div class="cell header">Torsdag</div>
-    <div class="cell header">Fredag</div>
-    <div class="cell header">Lördag</div>
-    <div class="cell header">Söndag</div>
+    <div class="header-row">
+      <div class="cell header"></div>
+      <div class="cell header">Måndag</div>
+      <div class="cell header">Tisdag</div>
+      <div class="cell header">Onsdag</div>
+      <div class="cell header">Torsdag</div>
+      <div class="cell header">Fredag</div>
+      <div class="cell header">Lördag</div>
+      <div class="cell header">Söndag</div>
+    </div>
   `;
 
   const events = JSON.parse(localStorage.getItem('events') || '{}');
@@ -156,6 +331,7 @@ function buildCalendar() {
             delete events[id];
             localStorage.setItem('events', JSON.stringify(events));
             buildCalendar();
+            updateStats();
           }
           return; // stoppar här
         }
@@ -166,6 +342,7 @@ function buildCalendar() {
         events[id] = title;
         localStorage.setItem('events', JSON.stringify(events));
         buildCalendar();
+        updateStats();
       };
 
       grid.appendChild(cell);
@@ -178,13 +355,70 @@ function buildCalendar() {
 
 buildCalendar();
 
-const notesArea = document.getElementById('notesArea');
-notesArea.value = localStorage.getItem('notes') || '';
+// Funktion för att uppdatera statistik
+function updateStats() {
+  const events = JSON.parse(localStorage.getItem('events') || '{}');
+  const todos = JSON.parse(localStorage.getItem('todos') || '[]');
+  document.getElementById('event-count').textContent = Object.keys(events).length;
+  document.getElementById('todo-count').textContent = todos.filter(t => !t.completed).length;
+}
 
-document.getElementById('saveNotes').onclick = () => {
-  localStorage.setItem('notes', notesArea.value);
-  alert('Anteckningar sparade!');
+updateStats();
+
+// Todo-funktionalitet
+let todos = JSON.parse(localStorage.getItem('todos') || '[]');
+
+function renderTodos() {
+  const todosList = document.getElementById('todosList');
+  todosList.innerHTML = '';
+  
+  todos.forEach((todo, index) => {
+    const todoItem = document.createElement('div');
+    todoItem.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+    todoItem.innerHTML = `
+      <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodo(${index})">
+      <span class="todo-text">${todo.text}</span>
+      <button class="todo-delete" onclick="deleteTodo(${index})">×</button>
+    `;
+    todosList.appendChild(todoItem);
+  });
+  
+  updateStats();
+}
+
+window.toggleTodo = function(index) {
+  todos[index].completed = !todos[index].completed;
+  localStorage.setItem('todos', JSON.stringify(todos));
+  renderTodos();
 };
+
+window.deleteTodo = function(index) {
+  todos.splice(index, 1);
+  localStorage.setItem('todos', JSON.stringify(todos));
+  renderTodos();
+};
+
+document.getElementById('addTodoBtn').onclick = () => {
+  const text = prompt('Ny uppgift:');
+  if (text) {
+    todos.push({ text, completed: false });
+    localStorage.setItem('todos', JSON.stringify(todos));
+    renderTodos();
+  }
+};
+
+renderTodos();
+
+// Dagens fokus - roterar mellan olika meddelanden
+const focusMessages = [
+  'Var produktiv idag',
+  'Fokusera på det viktiga',
+  'Ta en paus när du behöver',
+  'Små steg leder till stora resultat',
+  'Var närvarande i nuet'
+];
+const today = new Date().getDate();
+document.getElementById('focus-text').textContent = focusMessages[today % focusMessages.length];
 
 fetch('https://api.open-meteo.com/v1/forecast?latitude=59.33&longitude=18.07&current_weather=true')
   .then(r => r.json())
@@ -203,6 +437,64 @@ document.querySelectorAll('.menu a').forEach(link => {
     document.getElementById(link.dataset.view + '-view').classList.add('active-view');
   };
 });
+
+// Splash screen funktionalitet
+const splashScreen = document.getElementById('splash-screen');
+const enterText = document.getElementById('enter-text');
+const bgMusic = document.getElementById('bg-music');
+const mainContent = document.querySelector('.content');
+const sidebar = document.querySelector('.sidebar');
+const hoverZone = document.querySelector('.hover-zone');
+const sidebarIndicator = document.querySelector('.sidebar-indicator');
+
+// Dölj huvudinnehållet initialt
+mainContent.style.display = 'none';
+hoverZone.style.display = 'none';
+sidebarIndicator.style.display = 'none';
+
+// Sätt volym och förbered musiken
+bgMusic.volume = 0.5; // 50% volym
+let isMuted = false;
+
+// Mute-knapp funktionalitet
+const muteBtn = document.getElementById('muteBtn');
+const soundIcon = muteBtn.querySelector('.sound-icon');
+
+muteBtn.onclick = () => {
+  isMuted = !isMuted;
+  bgMusic.muted = isMuted;
+  
+  // Uppdatera ikon
+  if (isMuted) {
+    soundIcon.innerHTML = `
+      <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" fill="currentColor"/>
+    `;
+  } else {
+    soundIcon.innerHTML = `
+      <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="currentColor"/>
+    `;
+  }
+};
+
+// När man klickar på "click to enter"
+enterText.onclick = () => {
+  // Starta bakgrundsmusiken direkt vid klick (användarinteraktion)
+  bgMusic.play().catch(err => {
+    console.log('Kunde inte spela musik:', err);
+  });
+  
+  // Fade out splash screen
+  splashScreen.style.opacity = '0';
+  splashScreen.style.transition = 'opacity 0.5s ease';
+  
+  setTimeout(() => {
+    splashScreen.style.display = 'none';
+    // Visa huvudinnehållet
+    mainContent.style.display = 'block';
+    hoverZone.style.display = 'block';
+    sidebarIndicator.style.display = 'block';
+  }, 500);
+};
 </script>
 
 </main>

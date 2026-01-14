@@ -11,6 +11,35 @@ body {
   overflow: hidden;
 }
 
+/* ===================== SPLASH SCREEN ===================== */
+
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.enter-text {
+  margin: 0;
+  font-size: 10px;
+  color: #333;
+  text-transform: lowercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.enter-text:hover {
+  opacity: 0.6;
+}
+
 /* ===================== DESKTOP SIDEBAR ===================== */
 
 .hover-zone {
@@ -20,6 +49,25 @@ body {
   width: 12px;
   height: 100%;
   z-index: 99;
+  display: none;
+}
+
+.sidebar-indicator {
+  position: fixed;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 120px;
+  background: linear-gradient(180deg, rgba(240, 242, 240, 0.5) 0%, rgba(0, 12, 64, 0.5) 100%);
+  border-radius: 2px;
+  z-index: 98;
+  transition: opacity 0.3s ease, background 0.3s ease;
+  pointer-events: none;
+}
+
+.sidebar-indicator:hover {
+  background: linear-gradient(180deg, rgba(240, 242, 240, 0.8) 0%, rgba(0, 12, 64, 0.8) 100%);
 }
 
 .sidebar {
@@ -27,18 +75,23 @@ body {
   left: -260px;
   width: 260px;
   height: 100%;
-  background: #fff;
+  background: #ffffff !important;
   padding: 24px;
   transition: left 0.35s ease;
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 12px rgba(0,0,0,0.15);
   z-index: 100;
+  overflow-y: auto;
 }
 
-.hover-zone:hover + .sidebar,
+.sidebar * {
+  color: inherit;
+}
+
+.hover-zone:hover ~ .sidebar,
 .sidebar:hover {
-  left: 0;
+  left: 0 !important;
 }
 
 /* ===================== CONTENT ===================== */
@@ -50,6 +103,10 @@ body {
   background: #f7f7f7;
   height: 100%;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .hover-zone:hover ~ .content,
@@ -61,8 +118,33 @@ body {
 
 .logo {
   font-size: 22px;
-  color: #B320E5;
   margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-text {
+  background: linear-gradient(135deg, #F0F2F0 0%, #000C40 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #F0F2F0 0%, #000C40 100%);
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 18px;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 12, 64, 0.3);
+  letter-spacing: -0.5px;
 }
 
 .menu a {
@@ -70,7 +152,7 @@ body {
   padding: 12px;
   margin-bottom: 8px;
   text-decoration: none;
-  color: #333;
+  color: #333 !important;
   border-radius: 8px;
 }
 
@@ -83,14 +165,79 @@ body {
   margin: 24px 0;
   padding: 12px;
   border-radius: 10px;
-  border: 1px solid #B320E5;
+  border: 1px solid #000C40;
   background: transparent;
-  color: #B320E5;
+  color: #000C40 !important;
+  cursor: pointer;
+}
+
+.stats-widget {
+  margin: 20px 0;
+  padding: 16px;
+  background: #f8f8f8;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-around;
+  gap: 12px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #F0F2F0 0%, #000C40 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.focus-widget {
+  margin: 20px 0;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(240, 242, 240, 0.3) 0%, rgba(0, 12, 64, 0.1) 100%);
+  border-radius: 10px;
+  border-left: 3px solid #000C40;
+}
+
+.focus-label {
+  font-size: 10px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.focus-text {
+  font-size: 14px;
+  color: #333;
+  font-style: italic;
+  line-height: 1.4;
 }
 
 .weather {
   margin-top: auto;
   text-align: center;
+  color: #333;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+}
+
+.weather .temp,
+.weather .status {
+  color: #333;
 }
 
 /* ===================== TOPBAR ===================== */
@@ -100,6 +247,8 @@ body {
   justify-content: space-between;
   margin-bottom: 20px;
   align-items: center;
+  width: 85%;
+  max-width: 85%;
 }
 
 .icon {
@@ -110,38 +259,101 @@ body {
   cursor: pointer;
 }
 
+.mute-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #000C40;
+  background: transparent;
+  color: #000C40;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+}
 
-/* ===================== WEEK DROPDOWN ===================== */
+.mute-btn:hover {
+  background: linear-gradient(135deg, #F0F2F0 0%, #000C40 100%);
+  color: #fff;
+  transform: scale(1.1);
+}
 
+.sound-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+.date-pill {
+  padding: 6px 3px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #f7f7f7;
+  white-space: nowrap;
+}
+.date-pill,
+.week-badge {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.date-pill:hover,
+.week-badge:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 18px rgba(0, 12, 64, 0.25);
+}
+
+
+/* ===================== WEEK DROPDOWN FIX ===================== */
+
+/* Säkerställ att topbar och week-wrapper ligger över kalendern */
+.topbar {
+  position: relative;
+  z-index: 1000; /* högre än kalenderns sticky headers */
+}
+
+.week-badge {
+  position: relative;
+  z-index: 1100; /* alltid över kalendern */
+}
+
+/* Själva dropdownen */
 .week-menu {
-  display: none;
   position: absolute;
   top: 110%;
   left: 0;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 4px 0;
+  background: linear-gradient(135deg, #F0F2F0 0%, #000C40 100%);
+  color: #fff;
+  border-radius: 12px;
+  padding: 6px 0;
   min-width: 120px;
-  z-index: 10;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 1200; /* högst */
+  box-shadow: 0 10px 24px rgba(0,0,0,0.3);
+  display: none;
 
-  /* Scrollbar */
-  max-height: calc(10 * 32px); /* 10 veckor synliga */
+  max-height: 320px; /* 10 veckor synliga */
   overflow-y: auto;
-
-  list-style: none;
 }
 
+/* Week items */
 .week-menu li {
-  padding: 6px 12px;
+  padding: 8px 16px;
   cursor: pointer;
   font-size: 14px;
   line-height: 20px;
+  transition: background 0.2s ease;
 }
 
 .week-menu li:hover {
-  background: #ddd;
+  background: rgba(255,255,255,0.2);
+}
+
+/* Pilen roterar när dropdownen är öppen */
+.week-badge.open .dropdown-arrow {
+  transform: rotate(180deg);
+  opacity: 1;
+  transition: transform 0.25s ease;
 }
 
 /* ===================== VIEWS ===================== */
@@ -155,20 +367,43 @@ body {
   background: #fff;
   border-radius: 14px;
   padding: 20px;
+  width: 85%;
+  max-width: 85%;
+  margin: 0 auto;
+  overflow: hidden;
 }
 
 .calendar-grid {
   display: grid;
   grid-template-columns: 80px repeat(7, 1fr);
+  max-height: calc(40px + (9 * 60px)); /* Header (40px) + 9 rader (60px var) */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.header-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  background: linear-gradient(90deg, #F0F2F0 0%, #000C40 100%);
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
 .header {
   height: 40px;
-  background: #B320E5;
+  background: transparent;
   font-weight: 600;
   text-align: center;
   padding-top: 10px;
   color: #fff;
+  border: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header:last-child {
+  border-right: none;
 }
 
 .cell {
@@ -179,6 +414,15 @@ body {
   height: 60px;
 }
 
+.cell.header {
+  border: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cell.header:last-child {
+  border-right: none;
+}
+
 .cell.event-cell:hover {
   background: #f2f6ff;
   cursor: pointer;
@@ -187,11 +431,15 @@ body {
 .time {
   font-size: 12px;
   padding-top: 22px;
+  position: sticky;
+  left: 0;
+  background: #f7f7f7;
+  z-index: 5;
 }
 
 .event {
-  background: #B320E5;
-  color: #F5ECF9;
+  background: linear-gradient(135deg, #F0F2F0 0%, #000C40 100%);
+  color: #fff;
   padding: 4px 6px;
   border-radius: 6px;
   font-size: 12px;
@@ -202,6 +450,12 @@ body {
 }
 
 /* ===================== NOTES ===================== */
+
+.notes {
+  width: 75%;
+  max-width: 75%;
+  margin: 0 auto;
+}
 
 .notes textarea {
   width: 100%;
@@ -218,6 +472,124 @@ body {
   margin-top: 20px;
 }
 
+/* ===================== TODOS ===================== */
+
+.todos {
+  width: 85%;
+  max-width: 85%;
+  margin: 0 auto;
+}
+
+.todos-container {
+  background: #fff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.todos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.todos-header h2 {
+  font-size: 24px;
+  color: #333;
+  margin: 0;
+  font-weight: 600;
+}
+
+.add-todo-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #000C40;
+  background: transparent;
+  color: #000C40;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.add-todo-btn:hover {
+  background: linear-gradient(135deg, #F0F2F0 0%, #000C40 100%);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+.todos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.todo-item:hover {
+  background: #f0f0f0;
+  border-left-color: #000C40;
+}
+
+.todo-item.completed {
+  opacity: 0.6;
+}
+
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.todo-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #000C40;
+}
+
+.todo-text {
+  flex: 1;
+  font-size: 15px;
+  color: #333;
+}
+
+.todo-delete {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #999;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.todo-delete:hover {
+  background: #ff4444;
+  color: #fff;
+}
+
 .save {
   padding: 10px 16px;
   border-radius: 10px;
@@ -227,7 +599,7 @@ body {
 }
 
 .save.primary {
-  background: #B320E5;
+  background: linear-gradient(135deg, #F0F2F0 0%, #000C40 100%);
   color: #fff;
 }
 
@@ -243,6 +615,8 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+    width: 95%;
+    max-width: 95%;
   }
 
   /* Veckomeny nära datumet */
@@ -253,10 +627,18 @@ body {
   /* Kalender scrollar horisontellt om skärmen är smal */
   .calendar {
     overflow-x: auto;
+    width: 95%;
+    max-width: 95%;
+    padding: 16px;
   }
 
   .calendar-grid {
     min-width: 700px; /* säkerställer att alla 7 dagar syns */
+  }
+
+  .todos {
+    width: 95%;
+    max-width: 95%;
   }
 }
 
@@ -288,23 +670,50 @@ body {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 8px;
   }
 
   /* Kalender scrollar */
   .calendar {
     overflow-x: auto;
+    width: 100%;
+    max-width: 100%;
+    padding: 12px;
+    margin: 0;
+    border-radius: 10px;
   }
 
   .calendar-grid {
-    min-width: 720px;
+    min-width: 680px;
     display: grid;
-    grid-template-columns: 80px repeat(7, 1fr); /* 1 kolumn för tider, 7 för dagar */
+    grid-template-columns: 60px repeat(7, 1fr); /* Mindre tidskolumn på mobil */
     gap: 0;
+  }
 
+  .header-row {
+    grid-template-columns: 60px repeat(7, 1fr);
   }
 
   .cell {
-    height: 70px;
+    height: 60px;
+    min-width: 60px;
+  }
+
+  .time {
+    font-size: 10px;
+    padding-top: 20px;
+  }
+
+  .todos {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 8px;
+  }
+
+  .todos-container {
+    padding: 16px;
   }
 
   /* Veckomeny bredare på mobil */
@@ -332,12 +741,47 @@ body {
 }
 
 @media (max-width: 480px) {
+  .content {
+    padding: 12px;
+  }
+
+  .calendar {
+    padding: 8px;
+    border-radius: 8px;
+  }
+
   .calendar-grid {
-    min-width: 600px; /* Smalare skärmar */
+    min-width: 560px; /* Smalare skärmar */
+    grid-template-columns: 50px repeat(7, 1fr);
+  }
+
+  .header-row {
+    grid-template-columns: 50px repeat(7, 1fr);
   }
 
   .cell {
-    height: 60px;
+    height: 50px;
+    min-width: 50px;
+  }
+
+  .header {
+    height: 35px;
+    padding-top: 8px;
+    font-size: 11px;
+  }
+
+  .time {
+    font-size: 9px;
+    padding-top: 16px;
+  }
+
+  .event {
+    font-size: 10px;
+    padding: 2px 4px;
+  }
+
+  .topbar {
+    padding: 0 4px;
   }
 
   .topbar .left,
@@ -345,10 +789,20 @@ body {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .week-menu {
     right: 0; /* så den hamnar på rätt ställe på små skärmar */
     left: auto;
+  }
+
+  .todos-container {
+    padding: 12px;
+  }
+
+  .todos-header h2 {
+    font-size: 20px;
   }
 }
